@@ -1,0 +1,65 @@
+name: "Self Updating Cache"
+description: "Keeps and updated cache leveraging actions/cache and the recipe for using updated caches (https://github.com/actions/cache/blob/main/tips-and-workarounds.md#update-a-cache)"
+inputs:
+  key-prefix:
+    description: "A key for restoring and saving the cache. Will be the prefix of the real cache keys stored in github. This value should be a literal string"
+    required: true
+  key-suffix:
+    description: "Part of the key that will determine the need to create a new cache entry or not. This value should be a dynamically generated string"
+    required: true
+  ### Inputs and outputs from https://github.com/actions/cache/blob/a2ed59d39b352305bdd2f628719a53b2cc4f9613/action.yml at version v4.0.0
+  # We removed the `restore-keys` and `key` as we are setting those values
+  path:
+    description: "A list of files, directories, and wildcard patterns to cache and restore"
+    required: true
+  upload-chunk-size:
+    description: "The chunk size used to split up large files during upload, in bytes"
+    required: false
+  enableCrossOsArchive:
+    description: "An optional boolean when enabled, allows windows runners to save or restore caches that can be restored or saved respectively on other platforms"
+    default: "false"
+    required: false
+  fail-on-cache-miss:
+    description: "Fail the workflow if cache entry is not found"
+    default: "false"
+    required: false
+  lookup-only:
+    description: "Check if a cache entry exists for the given input(s) (key, restore-keys) without downloading the cache"
+    default: "false"
+    required: false
+  save-always:
+    description: "Run the post step to save the cache even if another step before fails"
+    default: "false"
+    required: false
+outputs:
+  cache-hit:
+    description: "A boolean value to indicate an exact match was found for the primary key"
+###
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Self Updating Cache
+      uses: actions/cache@v4.0.0
+      with:
+        path: ${{ inputs.path }}
+        # Will create a new cache entry if required (i.e. if the key-suffix is new)
+        key: ${{ inputs.key-prefix }}-${{ runner.os }}-${{ inputs.key-suffix }}
+        # Will restore the cache from the latest cache entry that matches the key-prefix
+        # https://github.com/actions/cache/blob/main/tips-and-workarounds.md#update-a-cache
+        restore-keys: |
+          ${{ inputs.key-prefix }}-${{ runner.os }}-
+          ${{ inputs.key-prefix }}-
+        upload-chunk-size: ${{ inputs.upload-chunk-size }}
+        enableCrossOsArchive: ${{ inputs.enableCrossOsArchive }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
+        lookup-only: ${{ inputs.lookup-only }}
+        save-always: ${{ inputs.save-always }}
+    - name: Set output
+      id: cache-hit
+      shell: bash
+      run: |
+        echo "cache-hit=${{ steps.cache-hit.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+branding:
+  icon: "archive"
+  color: "gray-dark"
