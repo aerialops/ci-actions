@@ -71,6 +71,6 @@ runs:
       working-directory: ${{ inputs.project_path }}
       # Only prune if we installed all dependencies to prevent pruning something
       # useful that we have to re-download later
-      if: inputs.install_dependencies == 'true' && inputs.skip_postinstall == 'false'
+      if: inputs.install_dependencies == 'true'
       shell: bash
       run: pnpm store prune
