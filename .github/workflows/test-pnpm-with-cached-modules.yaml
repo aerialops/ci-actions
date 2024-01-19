@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Self pnpm with cached modules should be able to run
+      - name: pnpm with cached modules should be able to run
         uses: ./pnpm-with-cached-modules
         id: pnpm-with-cached-modules
         with:
