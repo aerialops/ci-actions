@@ -61,12 +61,14 @@ runs:
         key-suffix: ${{ hashFiles('./pnpm-lock.yaml') }}
 
     - name: Install Dependencies
+      working-directory: ${{ inputs.project_path }}
       shell: bash
       run: pnpm install --frozen-lockfile
       if: inputs.install_dependencies == 'true'
 
     # Prevent unused dependencies from being stored in the cache forever
     - name: Prune unused dependencies
+      working-directory: ${{ inputs.project_path }}
       # Only prune if we installed all dependencies to prevent pruning something
       # useful that we have to re-download later
       if: inputs.install_dependencies == 'true' && inputs.skip_postinstall == 'false'
