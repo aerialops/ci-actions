@@ -24,4 +24,4 @@ jobs:
         uses: ./pnpm-with-cached-modules
         id: pnpm-with-cached-modules
         with:
-          project_path: ./pnpm-with-cached-modules
+          project_path: ./pnpm-with-cached-modules/test/
