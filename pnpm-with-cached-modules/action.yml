@@ -1,0 +1,76 @@
+name: "Install node, pnpm and packages using strong caching"
+description: "Install node and pnpm, download and install packages using cached node_modules and pnpm store"
+inputs:
+  install_node:
+    description: "Whether to skip installation of node"
+    required: false
+    default: true
+    type: boolean
+  node_version:
+    description: "The version of node to install"
+    required: false
+    default: 18
+    type: string
+  pnpm_version:
+    description: "The version of pnpm to install"
+    required: false
+    default: 8.14.1
+    type: string
+  install_dependencies:
+    description: "Whether to install dependencies"
+    required: false
+    default: true
+    type: boolean
+  project_path:
+    description: "The path where the package.json and node_modules reside. Expects a path ending in a /"
+    required: false
+    default: "./"
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v4.0.1
+      if: inputs.install_node == 'true'
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2.4.0
+      with:
+        version: ${{ inputs.pnpm_version }}
+        package_json_file: ${{ inputs.project_path }}package.json
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "PNPM_STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    - name: Setup pnpm cache
+      uses: aerialops/ci-actions/self-updating-cache@feat/add-self-updating-cache-action
+      # We don't want to cache the result if we're not installing dependencies
+      if: inputs.install_dependencies == 'true'
+      with:
+        path: |
+          ${{ steps.pnpm-cache.outputs.PNPM_STORE_PATH }}
+          ${{ inputs.project_path }}node_modules/
+        key-prefix: pnpm-store-v1
+        key-suffix: ${{ hashFiles('./pnpm-lock.yaml') }}
+
+    - name: Install Dependencies
+      working-directory: ${{ inputs.project_path }}
+      shell: bash
+      run: pnpm install --frozen-lockfile
+      if: inputs.install_dependencies == 'true'
+
+    # Prevent unused dependencies from being stored in the cache forever
+    - name: Prune unused dependencies
+      working-directory: ${{ inputs.project_path }}
+      # Only prune if we installed all dependencies to prevent pruning something
+      # useful that we have to re-download later
+      if: inputs.install_dependencies == 'true'
+      shell: bash
+      run: pnpm store prune
