@@ -1,5 +1,5 @@
-name: "Install node, pnpm and packages"
-description: "Install node and pnpm, download and install packages and setup the cache"
+name: "Install node, pnpm and packages using strong caching"
+description: "Install node and pnpm, download and install packages using cached node_modules and pnpm store"
 inputs:
   install_node:
     description: "Whether to skip installation of node"
