@@ -1,0 +1,33 @@
+name: Test Self Updating Cache
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Self Updating Cache should be able to run
+        uses: ./self-updating-cache
+        id: self-updating-cache
+        with:
+          # Add any random file to see if it works
+          path: |
+            ./self-updating-cache/action.yml
+          key-prefix: |
+            self-updating-cache-test
+          key-suffix: |
+            ${{ github.sha }}
