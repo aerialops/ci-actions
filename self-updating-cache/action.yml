@@ -1,5 +1,5 @@
 name: "Self Updating Cache"
-description: "Keeps and updated cache leveraging actions/cache and the recipe for using updated caches (https://github.com/actions/cache/blob/main/tips-and-workarounds.md#update-a-cache)"
+description: "Keeps an updated cache leveraging actions/cache and the recipe for using updated caches (https://github.com/actions/cache/blob/main/tips-and-workarounds.md#update-a-cache)"
 inputs:
   key-prefix:
     description: "A key for restoring and saving the cache. Will be the prefix of the real cache keys stored in github. This value should be a literal string"
@@ -60,6 +60,7 @@ runs:
       shell: bash
       run: |
         echo "cache-hit=${{ steps.cache-hit.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#branding
 branding:
   icon: "archive"
   color: "gray-dark"
