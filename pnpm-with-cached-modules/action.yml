@@ -26,6 +26,11 @@ inputs:
     required: false
     default: "./"
     type: string
+  prune_store:
+    description: "Whether to prune the pnpm store to remove unused dependencies"
+    required: false
+    default: true
+    type: boolean
 
 runs:
   using: "composite"
@@ -71,6 +76,6 @@ runs:
       working-directory: ${{ inputs.project_path }}
       # Only prune if we installed all dependencies to prevent pruning something
       # useful that we have to re-download later
-      if: inputs.install_dependencies == 'true'
+      if: inputs.prune_store == 'true' && inputs.install_dependencies == 'true'
       shell: bash
       run: pnpm store prune
