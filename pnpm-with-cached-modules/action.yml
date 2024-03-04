@@ -37,7 +37,7 @@ runs:
         node-version: ${{ inputs.node_version }}
 
     - name: Install pnpm
-      uses: pnpm/action-setup@v2.4.0
+      uses: pnpm/action-setup@v3.0.0
       with:
         version: ${{ inputs.pnpm_version }}
         package_json_file: ${{ inputs.project_path }}package.json
