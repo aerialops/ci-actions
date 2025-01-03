@@ -50,7 +50,7 @@ runs:
         echo "PNPM_STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
     - name: Setup pnpm cache
-      uses: aerialops/ci-actions/self-updating-cache@feat/add-self-updating-cache-action
+      uses: aerialops/ci-actions/self-updating-cache@main
       # We don't want to cache the result if we're not installing dependencies
       if: inputs.install_dependencies == 'true'
       with:
