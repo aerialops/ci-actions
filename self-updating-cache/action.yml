@@ -40,7 +40,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Self Updating Cache
-      uses: actions/cache@v4.0.0
+      uses: actions/cache@v4
       with:
         path: ${{ inputs.path }}
         # Will create a new cache entry if required (i.e. if the key-suffix is new)
